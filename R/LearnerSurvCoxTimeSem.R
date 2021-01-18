@@ -139,11 +139,11 @@ LearnerSurvCoxtime2 = R6::R6Class("LearnerSurvCoxtime2",
 
                                      # Set-up network architecture
                                      # num_nodes needs to be reconstructed
-                                     num_nodes_raw = c(self$param_setget_values(tags = "net")$num_nodes1,
-                                                       self$param_setget_values(tags = "net")$num_nodes2,
-                                                       self$param_setget_values(tags = "net")$num_nodes3,
-                                                       self$param_setget_values(tags = "net")$num_nodes4,
-                                                       self$param_setget_values(tags = "net")$num_nodes5)
+                                     num_nodes_raw = c(self$param_set$get_values(tags = "net")$num_nodes1,
+                                                       self$param_set$get_values(tags = "net")$num_nodes2,
+                                                       self$param_set$get_values(tags = "net")$num_nodes3,
+                                                       self$param_set$get_values(tags = "net")$num_nodes4,
+                                                       self$param_set$get_values(tags = "net")$num_nodes5)
                                      num_nodes <- num_nodes[num_nodes > 0]
                                      pars = self$param_set$get_values(tags = "net")
                                      pars$num_nodes <- num_nodes
