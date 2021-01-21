@@ -116,6 +116,13 @@ LearnerSurvCoxtime2 = R6::R6Class("LearnerSurvCoxtime2",
                                      ps$add_dep("min_delta", "early_stopping", CondEqual$new(TRUE))
                                      ps$add_dep("patience", "early_stopping", CondEqual$new(TRUE))
 
+                                     # transform num_layers and nodes_per_layer into a single num_nodes variable
+                                     ps$trafo = function(x, param_set) {
+                                       x$num_nodes = rep(as.integer(as.character(x$nodes_per_layer)), x$num_layers)
+                                       x$nodes_per_layer = x$num_layers = NULL
+                                       return(x)
+                                     }
+                                     
                                      super$initialize(
                                        id = "surv.coxtime2",
                                        feature_types = c("integer", "numeric"),
@@ -144,8 +151,6 @@ LearnerSurvCoxtime2 = R6::R6Class("LearnerSurvCoxtime2",
 
                                      # Set-up network architecture
                                      # num_nodes needs to be reconstructed
-                                     num_nodes <- rep(as.integer(as.integer(self$param_set$get_values(tags = "net")$nodes_per_layer)),
-                                                      self$param_set$get_values(tags = "net")$num_layers)
                                      # num_nodes_raw = c(self$param_set$get_values(tags = "net")$num_nodes1,
                                      #                   self$param_set$get_values(tags = "net")$num_nodes2,
                                      #                   self$param_set$get_values(tags = "net")$num_nodes3,
@@ -153,10 +158,7 @@ LearnerSurvCoxtime2 = R6::R6Class("LearnerSurvCoxtime2",
                                      #                   self$param_set$get_values(tags = "net")$num_nodes5)
                                      # num_nodes <- num_nodes[num_nodes > 0]
                                      pars = self$param_set$get_values(tags = "net")
-                                     pars$num_nodes <- num_nodes
-                                     # nodes_per_layer and num_layers need to be removed
-                                     pars$nodes_per_layer <- NULL
-                                     pars$num_layers <- NULL
+                                     # pars$num_nodes <- num_nodes
                                      net = mlr3misc::invoke(
                                        pycox$models$cox_time$MLPVanillaCoxTime,
                                        in_features = x_train$shape[1],
