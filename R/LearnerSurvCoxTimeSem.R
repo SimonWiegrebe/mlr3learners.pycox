@@ -154,6 +154,9 @@ LearnerSurvCoxtime2 = R6::R6Class("LearnerSurvCoxtime2",
                                      # num_nodes <- num_nodes[num_nodes > 0]
                                      pars = self$param_set$get_values(tags = "net")
                                      pars$num_nodes <- num_nodes
+                                     # nodes_per_layer and num_layers need to be removed
+                                     pars$nodes_per_layer <- NULL
+                                     pars$num_layers <- NULL
                                      net = mlr3misc::invoke(
                                        pycox$models$cox_time$MLPVanillaCoxTime,
                                        in_features = x_train$shape[1],
