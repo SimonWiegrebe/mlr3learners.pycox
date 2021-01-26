@@ -184,7 +184,7 @@ LearnerSurvCoxtime2 = R6::R6Class("LearnerSurvCoxtime2",
                                        optimizer = mlr3misc::invoke(get_optim,
                                                                     net = net,
                                                                     .args = self$param_set$get_values(tags = "opt")),
-                                       .args = pars
+                                       .args = pars[names(pars) %nin% c("num_layers", "nodes_per_layer")]
                                      )
 
                                      # Optionally internally optimise learning rate for all optimizers except Adadelta
@@ -195,7 +195,7 @@ LearnerSurvCoxtime2 = R6::R6Class("LearnerSurvCoxtime2",
                                            model$lr_finder,
                                            input = x_train,
                                            target = y_train,
-                                           .args = pars[names(pars) %nin% c("optimizer", "adadelta")]
+                                           .args = pars[names(pars) %nin% c("optimizer", "adadelta", "num_layers", "nodes_per_layer")]
                                          )
                                          model$optimizer$set_lr(lrfinder$get_best_lr())
                                        }
@@ -223,7 +223,7 @@ LearnerSurvCoxtime2 = R6::R6Class("LearnerSurvCoxtime2",
                                        target = y_train,
                                        callbacks = callbacks,
                                        val_data = data$val,
-                                       .args = pars
+                                       .args = pars[names(pars) %nin% c("num_layers", "nodes_per_layer")]
                                      )
                                    },
 
@@ -242,7 +242,7 @@ LearnerSurvCoxtime2 = R6::R6Class("LearnerSurvCoxtime2",
                                      surv = mlr3misc::invoke(
                                        self$model$model$predict_surv_df,
                                        x_test,
-                                       .args = pars
+                                       .args = pars[names(pars) %nin% c("num_layers", "nodes_per_layer")]
                                      )
 
                                      # cast to distr6
