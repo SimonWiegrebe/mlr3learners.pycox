@@ -34,13 +34,12 @@ LearnerSurvCoxtime2 = R6::R6Class("LearnerSurvCoxtime2",
                                          ParamLgl$new("log_duration", default = FALSE, tags = c("train", "prep")),
                                          ParamLgl$new("with_mean", default = FALSE, tags = c("train", "prep")),
                                          ParamLgl$new("with_std", default = FALSE, tags = c("train", "prep")),
-                                         ParamInt$new("nodes_per_layer", lower = 1, upper = 256, tags = c("train", "net")),
+                                         # new: one hyperparameter for nodes per layer and one for network depth
+                                         ParamFct$new("nodes_per_layer",
+                                                      default = 32,
+                                                      levels = c("4", "8", "16", "32", "64", "128", "256"),
+                                                      tags = c("train", "net")),
                                          ParamInt$new("num_layers", default = 1, lower = 1, upper = 5, tags = c("train", "net")),
-                                         # ParamInt$new("num_nodes1", default = 1, lower = 1, tags = c("train", "net", "required")),
-                                         # ParamInt$new("num_nodes2", default = 0, lower = 0, tags = c("train", "net", "required")),
-                                         # ParamInt$new("num_nodes3", default = 0, lower = 0, tags = c("train", "net", "required")),
-                                         # ParamInt$new("num_nodes4", default = 0, lower = 0, tags = c("train", "net", "required")),
-                                         # ParamInt$new("num_nodes5", default = 0, lower = 0, tags = c("train", "net", "required")),
                                          ParamLgl$new("batch_norm", default = TRUE, tags = c("train", "net")),
                                          ParamDbl$new("dropout",
                                                       default = "None", special_vals = list("None"),
@@ -113,13 +112,6 @@ LearnerSurvCoxtime2 = R6::R6Class("LearnerSurvCoxtime2",
                                      ps$add_dep("min_delta", "early_stopping", CondEqual$new(TRUE))
                                      ps$add_dep("patience", "early_stopping", CondEqual$new(TRUE))
 
-                                     # # transform num_layers and nodes_per_layer into a single num_nodes variable
-                                     # ps$trafo = function(x, param_set) {
-                                     #   x$num_nodes = rep(as.integer(as.character(x$nodes_per_layer)), x$num_layers)
-                                     #   x$nodes_per_layer = x$num_layers = NULL
-                                     #   return(x)
-                                     # }
-
                                      super$initialize(
                                        id = "surv.coxtime2",
                                        feature_types = c("integer", "numeric"),
@@ -148,19 +140,10 @@ LearnerSurvCoxtime2 = R6::R6Class("LearnerSurvCoxtime2",
 
                                      # Set-up network architecture
 
-                                     # num_nodes needs to be reconstructed
-
-                                     # num_nodes_raw = c(self$param_set$get_values(tags = "net")$num_nodes1,
-                                     #                   self$param_set$get_values(tags = "net")$num_nodes2,
-                                     #                   self$param_set$get_values(tags = "net")$num_nodes3,
-                                     #                   self$param_set$get_values(tags = "net")$num_nodes4,
-                                     #                   self$param_set$get_values(tags = "net")$num_nodes5)
-                                     # num_nodes <- num_nodes[num_nodes > 0]
-
                                      pars = self$param_set$get_values(tags = "net")
+                                     # new: construct num_nodes
                                      num_nodes = as.integer(rep(pars["nodes_per_layer"],
                                                                 pars["num_layers"]))
-                                     #pars = pars[names(pars) %nin% c("num_layers", "nodes_per_layer")]
                                      net = mlr3misc::invoke(
                                        pycox$models$cox_time$MLPVanillaCoxTime,
                                        in_features = x_train$shape[1],
@@ -168,7 +151,7 @@ LearnerSurvCoxtime2 = R6::R6Class("LearnerSurvCoxtime2",
                                        activation = mlr3misc::invoke(get_activation,
                                                                      construct = FALSE,
                                                                      .args = self$param_set$get_values(tags = "act")),
-                                       # exclude num_nodes (already accounted for) as well as newly created num_layers and nodes_per_layer
+                                       # new: exclude num_nodes (already accounted for) as well as newly created num_layers and nodes_per_layer
                                        .args = pars[names(pars) %nin% c("num_nodes", "num_layers", "nodes_per_layer")]
                                      )
 
