@@ -126,7 +126,7 @@ LearnerSurvCoxtime3 = R6::R6Class("LearnerSurvCoxtime3",
                                      pars = self$param_set$get_values(tags = "prep")
                                      data = mlr3misc::invoke(
                                        prepare_train_data,
-                                       model = "CoxTime3",
+                                       model = "CoxTime",
                                        task = task,
                                        .args = pars
                                      )
@@ -138,7 +138,7 @@ LearnerSurvCoxtime3 = R6::R6Class("LearnerSurvCoxtime3",
                                      net = mlr3misc::invoke(
                                        pycox$models$cox_time$MLPVanillaCoxTime,
                                        in_features = x_train$shape[1],
-                                       num_nodes = reticulate::r_to_py(as.integer(c(32L, 32L))),
+                                       num_nodes = reticulate::r_to_py(as.integer(pars$num_nodes)),
                                        activation = mlr3misc::invoke(get_activation,
                                                                      construct = FALSE,
                                                                      .args = self$param_set$get_values(tags = "act")),
