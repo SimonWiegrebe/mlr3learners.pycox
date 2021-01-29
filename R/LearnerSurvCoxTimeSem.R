@@ -140,7 +140,7 @@ LearnerSurvCoxtime2 = R6::R6Class("LearnerSurvCoxtime2",
                                      pars = self$param_set$get_values(tags = "prep")
                                      data = mlr3misc::invoke(
                                        prepare_train_data,
-                                       model = "CoxTime2",
+                                       model = "CoxTime",
                                        task = task,
                                        .args = pars
                                      )
@@ -232,7 +232,7 @@ LearnerSurvCoxtime2 = R6::R6Class("LearnerSurvCoxtime2",
 
                                      # get test data
                                      x_test = task$data(cols = task$feature_names)
-                                     x_test = reticulate::r_to_py(x_test)$values$astype("float64")
+                                     x_test = reticulate::r_to_py(x_test)$values$astype("float32")
 
                                      # predict survival probabilities
                                      pars = self$param_set$get_values(tags = "predict")
