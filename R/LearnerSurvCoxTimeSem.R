@@ -160,16 +160,16 @@ LearnerSurvCoxtime2 = R6::R6Class("LearnerSurvCoxtime2",
                                      # num_nodes <- num_nodes[num_nodes > 0]
 
                                      pars = self$param_set$get_values(tags = "net")
-                                     pars = pars[names(pars) %nin% c("num_layers", "nodes_per_layer")]
+                                     #pars = pars[names(pars) %nin% c("num_layers", "nodes_per_layer")]
                                      net = mlr3misc::invoke(
                                        pycox$models$cox_time$MLPVanillaCoxTime,
                                        in_features = x_train$shape[1],
-                                       num_nodes = reticulate::r_to_py(as.integer(pars$num_nodes)),
+                                       num_nodes = reticulate::r_to_py(as.integer(num_nodes)),
                                        activation = mlr3misc::invoke(get_activation,
                                                                      construct = FALSE,
                                                                      .args = self$param_set$get_values(tags = "act")),
                                        # exclude num_nodes (already accounted for) as well as newly created num_layers and nodes_per_layer
-                                       .args = pars[names(pars) %nin% "num_nodes"]
+                                       .args = pars[names(pars) %nin% c("num_nodes", "num_layers", "nodes_per_layer")]
                                      )
 
                                      # Get optimizer and set-up model
