@@ -34,10 +34,7 @@ LearnerSurvCoxtime2 = R6::R6Class("LearnerSurvCoxtime2",
                                          ParamLgl$new("log_duration", default = FALSE, tags = c("train", "prep")),
                                          ParamLgl$new("with_mean", default = FALSE, tags = c("train", "prep")),
                                          ParamLgl$new("with_std", default = FALSE, tags = c("train", "prep")),
-                                         ParamFct$new("nodes_per_layer",
-                                                      default = "32",
-                                                      levels = c("8", "16", "32", "64", "128", "256"),
-                                                      tags = c("train")),
+                                         ParamInt$new("nodes_per_layer", lower = 1, upper = 256, tags = c("train")),
                                          ParamInt$new("num_layers", default = 1, lower = 1, upper = 5, tags = c("train")),
                                          # ParamInt$new("num_nodes1", default = 1, lower = 1, tags = c("train", "net", "required")),
                                          # ParamInt$new("num_nodes2", default = 0, lower = 0, tags = c("train", "net", "required")),
@@ -87,7 +84,7 @@ LearnerSurvCoxtime2 = R6::R6Class("LearnerSurvCoxtime2",
                                          ParamLgl$new("early_stopping", default = FALSE, tags = c("train", "callbacks")),
                                          ParamDbl$new("min_delta", default = 0, tags = c("train", "early")),
                                          ParamInt$new("patience", default = 10, tags = c("train", "early")),
-                                         ParamUty$new("num_nodes", default = NULL, tags = "net")
+                                         ParamUty$new("num_nodes", tags = "net")
                                        )
                                      )
 
