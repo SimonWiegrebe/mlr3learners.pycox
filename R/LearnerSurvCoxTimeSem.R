@@ -83,8 +83,7 @@ LearnerSurvCoxtime2 = R6::R6Class("LearnerSurvCoxtime2",
                                          ParamLgl$new("best_weights", default = FALSE, tags = c("train", "callbacks")),
                                          ParamLgl$new("early_stopping", default = FALSE, tags = c("train", "callbacks")),
                                          ParamDbl$new("min_delta", default = 0, tags = c("train", "early")),
-                                         ParamInt$new("patience", default = 10, tags = c("train", "early")),
-                                         ParamUty$new("num_nodes", default = c(2, 1), tags = "net")
+                                         ParamInt$new("patience", default = 10, tags = c("train", "early"))
                                        )
                                      )
 
@@ -150,8 +149,7 @@ LearnerSurvCoxtime2 = R6::R6Class("LearnerSurvCoxtime2",
                                      # Set-up network architecture
 
                                      # num_nodes needs to be reconstructed
-                                     num_nodes <- c(32L, 32L)
-                                     self$param_set$values$num_nodes = num_nodes
+                                     num_nodes = as.integer(rep(nodes_per_layer, num_layers))
                                      # num_nodes_raw = c(self$param_set$get_values(tags = "net")$num_nodes1,
                                      #                   self$param_set$get_values(tags = "net")$num_nodes2,
                                      #                   self$param_set$get_values(tags = "net")$num_nodes3,
@@ -164,7 +162,7 @@ LearnerSurvCoxtime2 = R6::R6Class("LearnerSurvCoxtime2",
                                      net = mlr3misc::invoke(
                                        pycox$models$cox_time$MLPVanillaCoxTime,
                                        in_features = x_train$shape[1],
-                                       num_nodes = reticulate::r_to_py(as.integer(c(32L, 32L))),
+                                       num_nodes = reticulate::r_to_py(as.integer(num_nodes)),
                                        activation = mlr3misc::invoke(get_activation,
                                                                      construct = FALSE,
                                                                      .args = self$param_set$get_values(tags = "act")),
