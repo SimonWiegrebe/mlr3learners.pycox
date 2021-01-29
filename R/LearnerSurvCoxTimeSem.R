@@ -167,7 +167,7 @@ LearnerSurvCoxtime2 = R6::R6Class("LearnerSurvCoxtime2",
                                      net = mlr3misc::invoke(
                                        pycox$models$cox_time$MLPVanillaCoxTime,
                                        in_features = x_train$shape[1],
-                                       num_nodes = reticulate::r_to_py(pars$num_nodes),
+                                       num_nodes = reticulate::r_to_py(as.integer(pars$num_nodes)),
                                        activation = mlr3misc::invoke(get_activation,
                                                                      construct = FALSE,
                                                                      .args = self$param_set$get_values(tags = "act")),
