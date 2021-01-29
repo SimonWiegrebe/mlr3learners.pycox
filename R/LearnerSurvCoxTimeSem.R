@@ -149,7 +149,7 @@ LearnerSurvCoxtime2 = R6::R6Class("LearnerSurvCoxtime2",
                                      # Set-up network architecture
 
                                      # num_nodes needs to be reconstructed
-                                     num_nodes = as.integer(rep(nodes_per_layer, num_layers))
+
                                      # num_nodes_raw = c(self$param_set$get_values(tags = "net")$num_nodes1,
                                      #                   self$param_set$get_values(tags = "net")$num_nodes2,
                                      #                   self$param_set$get_values(tags = "net")$num_nodes3,
@@ -158,6 +158,8 @@ LearnerSurvCoxtime2 = R6::R6Class("LearnerSurvCoxtime2",
                                      # num_nodes <- num_nodes[num_nodes > 0]
 
                                      pars = self$param_set$get_values(tags = "net")
+                                     num_nodes = as.integer(rep(pars["nodes_per_layer"],
+                                                                pars["num_layers"]))
                                      #pars = pars[names(pars) %nin% c("num_layers", "nodes_per_layer")]
                                      net = mlr3misc::invoke(
                                        pycox$models$cox_time$MLPVanillaCoxTime,
