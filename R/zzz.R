@@ -16,7 +16,6 @@ register_mlr3 = function(libname, pkgname) {
   x$add("surv.pchazard", LearnerSurvPCHazard)
   x$add("surv.loghaz", LearnerSurvLogisticHazard)
   x$add("surv.coxtime2", LearnerSurvCoxtime2)
-  x$add("surv.coxtime3", LearnerSurvCoxtime3)
 }
 
 pycox = torch = torchtuples = NULL
