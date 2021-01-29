@@ -1,6 +1,6 @@
 #' @title Survival Cox-Time Learner
 #'
-#' @name mlr_learners_surv.coxtime2
+#' @name mlr_learners_surv.coxtime3
 #'
 #' @description
 #' A [mlr3proba::LearnerSurv] implementing Cox-Time from Python package
@@ -8,7 +8,7 @@
 #'
 #' Calls `pycox.models.CoxTime`.
 #'
-#' @templateVar id surv.coxtime2
+#' @templateVar id surv.coxtime3
 #' @template section_dictionary_learner
 #'
 #' @references
@@ -19,7 +19,7 @@
 #' @template seealso_learner
 #' @template example
 #' @export
-LearnerSurvCoxtime2 = R6::R6Class("LearnerSurvCoxtime2",
+LearnerSurvCoxtime3 = R6::R6Class("LearnerSurvCoxtime3",
                                  inherit = mlr3proba::LearnerSurv,
 
                                  public = list(
@@ -32,15 +32,9 @@ LearnerSurvCoxtime2 = R6::R6Class("LearnerSurvCoxtime2",
                                          ParamDbl$new("frac", default = 0, lower = 0, upper = 1, tags = c("train", "prep")),
                                          ParamLgl$new("standardize_time", default = FALSE, tags = c("train", "prep")),
                                          ParamLgl$new("log_duration", default = FALSE, tags = c("train", "prep")),
-                                         ParamLgl$new("with_mean", default = FALSE, tags = c("train", "prep")),
-                                         ParamLgl$new("with_std", default = FALSE, tags = c("train", "prep")),
-                                         ParamInt$new("nodes_per_layer", lower = 1, upper = 256, tags = c("train")),
-                                         ParamInt$new("num_layers", default = 1, lower = 1, upper = 5, tags = c("train")),
-                                         # ParamInt$new("num_nodes1", default = 1, lower = 1, tags = c("train", "net", "required")),
-                                         # ParamInt$new("num_nodes2", default = 0, lower = 0, tags = c("train", "net", "required")),
-                                         # ParamInt$new("num_nodes3", default = 0, lower = 0, tags = c("train", "net", "required")),
-                                         # ParamInt$new("num_nodes4", default = 0, lower = 0, tags = c("train", "net", "required")),
-                                         # ParamInt$new("num_nodes5", default = 0, lower = 0, tags = c("train", "net", "required")),
+                                         ParamLgl$new("with_mean", default = TRUE, tags = c("train", "prep")),
+                                         ParamLgl$new("with_std", default = TRUE, tags = c("train", "prep")),
+                                         ParamUty$new("num_nodes", tags = c("train", "net", "required")),
                                          ParamLgl$new("batch_norm", default = TRUE, tags = c("train", "net")),
                                          ParamDbl$new("dropout",
                                                       default = "None", special_vals = list("None"),
@@ -83,8 +77,7 @@ LearnerSurvCoxtime2 = R6::R6Class("LearnerSurvCoxtime2",
                                          ParamLgl$new("best_weights", default = FALSE, tags = c("train", "callbacks")),
                                          ParamLgl$new("early_stopping", default = FALSE, tags = c("train", "callbacks")),
                                          ParamDbl$new("min_delta", default = 0, tags = c("train", "early")),
-                                         ParamInt$new("patience", default = 10, tags = c("train", "early")),
-                                         ParamUty$new("num_nodes", default = c(2, 1), tags = "net")
+                                         ParamInt$new("patience", default = 10, tags = c("train", "early"))
                                        )
                                      )
 
@@ -114,19 +107,12 @@ LearnerSurvCoxtime2 = R6::R6Class("LearnerSurvCoxtime2",
                                      ps$add_dep("min_delta", "early_stopping", CondEqual$new(TRUE))
                                      ps$add_dep("patience", "early_stopping", CondEqual$new(TRUE))
 
-                                     # # transform num_layers and nodes_per_layer into a single num_nodes variable
-                                     # ps$trafo = function(x, param_set) {
-                                     #   x$num_nodes = rep(as.integer(as.character(x$nodes_per_layer)), x$num_layers)
-                                     #   x$nodes_per_layer = x$num_layers = NULL
-                                     #   return(x)
-                                     # }
-
                                      super$initialize(
-                                       id = "surv.coxtime2",
+                                       id = "surv.coxtime3",
                                        feature_types = c("integer", "numeric"),
                                        predict_types = c("crank", "distr"),
                                        param_set = ps,
-                                       man = "mlr3learners.pycox::surv.coxtime2",
+                                       man = "mlr3learners.pycox::surv.coxtime3",
                                        packages = "mlr3learners.pycox"
                                      )
                                    }
@@ -140,7 +126,7 @@ LearnerSurvCoxtime2 = R6::R6Class("LearnerSurvCoxtime2",
                                      pars = self$param_set$get_values(tags = "prep")
                                      data = mlr3misc::invoke(
                                        prepare_train_data,
-                                       model = "CoxTime2",
+                                       model = "CoxTime3",
                                        task = task,
                                        .args = pars
                                      )
@@ -148,19 +134,7 @@ LearnerSurvCoxtime2 = R6::R6Class("LearnerSurvCoxtime2",
                                      y_train = data$y_train
 
                                      # Set-up network architecture
-
-                                     # num_nodes needs to be reconstructed
-                                     num_nodes <- c(32L, 32L)
-                                     self$param_set$values$num_nodes = num_nodes
-                                     # num_nodes_raw = c(self$param_set$get_values(tags = "net")$num_nodes1,
-                                     #                   self$param_set$get_values(tags = "net")$num_nodes2,
-                                     #                   self$param_set$get_values(tags = "net")$num_nodes3,
-                                     #                   self$param_set$get_values(tags = "net")$num_nodes4,
-                                     #                   self$param_set$get_values(tags = "net")$num_nodes5)
-                                     # num_nodes <- num_nodes[num_nodes > 0]
-
                                      pars = self$param_set$get_values(tags = "net")
-                                     #pars = pars[names(pars) %nin% c("num_layers", "nodes_per_layer")]
                                      net = mlr3misc::invoke(
                                        pycox$models$cox_time$MLPVanillaCoxTime,
                                        in_features = x_train$shape[1],
@@ -168,8 +142,7 @@ LearnerSurvCoxtime2 = R6::R6Class("LearnerSurvCoxtime2",
                                        activation = mlr3misc::invoke(get_activation,
                                                                      construct = FALSE,
                                                                      .args = self$param_set$get_values(tags = "act")),
-                                       # exclude num_nodes (already accounted for) as well as newly created num_layers and nodes_per_layer
-                                       .args = pars[names(pars) %nin% c("num_nodes", "num_layers", "nodes_per_layer")]
+                                       .args = pars[names(pars) %nin% "num_nodes"]
                                      )
 
                                      # Get optimizer and set-up model
@@ -232,7 +205,7 @@ LearnerSurvCoxtime2 = R6::R6Class("LearnerSurvCoxtime2",
 
                                      # get test data
                                      x_test = task$data(cols = task$feature_names)
-                                     x_test = reticulate::r_to_py(x_test)$values$astype("float64")
+                                     x_test = reticulate::r_to_py(x_test)$values$astype("float32")
 
                                      # predict survival probabilities
                                      pars = self$param_set$get_values(tags = "predict")
