@@ -122,7 +122,7 @@ LearnerSurvCoxtime2 = R6::R6Class("LearnerSurvCoxtime2",
                                      #   x$nodes_per_layer = x$num_layers = NULL
                                      #   return(x)
                                      # }
-                                     
+
                                      super$initialize(
                                        id = "surv.coxtime2",
                                        feature_types = c("integer", "numeric"),
@@ -150,18 +150,18 @@ LearnerSurvCoxtime2 = R6::R6Class("LearnerSurvCoxtime2",
                                      y_train = data$y_train
 
                                      # Set-up network architecture
-                                     
+
                                      # num_nodes needs to be reconstructed
-                                     num_nodes <- rep(as.integer(self$param_set$get_values(tags = "net")$nodes_per_layer),
+                                     num_nodes <- rep(self$param_set$get_values(tags = "net")$nodes_per_layer,
                                                       self$param_set$get_values(tags = "net")$num_layers)
-                                     
+
                                      # num_nodes_raw = c(self$param_set$get_values(tags = "net")$num_nodes1,
                                      #                   self$param_set$get_values(tags = "net")$num_nodes2,
                                      #                   self$param_set$get_values(tags = "net")$num_nodes3,
                                      #                   self$param_set$get_values(tags = "net")$num_nodes4,
                                      #                   self$param_set$get_values(tags = "net")$num_nodes5)
                                      # num_nodes <- num_nodes[num_nodes > 0]
-                                     
+
                                      pars = self$param_set$get_values(tags = "net")
                                      pars$num_nodes = num_nodes
                                      pars = pars[names(pars) %nin% c("num_layers", "nodes_per_layer")]
